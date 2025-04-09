@@ -91,7 +91,6 @@
         </div>
         <div>
             File format:
-            {selectedCategory}
             <select bind:value={selectedFormat}>
                 {#each categories[selectedCategory] as format}
                     <option value={format}>{format}</option>
