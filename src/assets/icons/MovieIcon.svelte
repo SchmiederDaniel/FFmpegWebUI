@@ -8,8 +8,7 @@
         <path d="M 0 12.34 Q 0 12.34 77.23 12.34"/>
         <path d="M -0.23 49.6 Q -0.23 49.6 77.23 49.41"/>
         <path d="M 31 31 L 31 21 Q 31 18 33.57 19.55 L 49.93 29.45 Q 52.5 31 49.93 32.55 L 33.57 42.45 Q 31 44 31 41 Z"
-              style="fill: transparent; stroke: currentColor;"
-              stroke="#000000"/>
+              style="fill: transparent;" />
         <path d="M 14 12 Q 14 12 14 0"/>
         <path d="M 30 12 Q 30 12 30.05 0"/>
         <path d="M 63 12 Q 63 12 63 0"/>
@@ -29,9 +28,5 @@
         align-items: center;
         width: 100%;
         height: 100%;
-    }
-
-    svg {
-        color: white;
     }
 </style>

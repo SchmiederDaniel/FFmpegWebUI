@@ -73,8 +73,6 @@
         margin: 6px 8px;
 
         font-size: 1.3em;
-        --button-color: rgb(20, 20, 20);
-        background-color: var(--button-color);
         transition: all 0.1s,
         background-color 0.25s;
         display: flex;
@@ -91,8 +89,7 @@
     }
 
     .selected {
-        background: rgb(20, 20, 20);
-        border-left: 4px solid rgba(255, 255, 255, 0.8);
+        border-left: 4px solid currentColor;
         border-bottom-left-radius: 4px;
         border-top-left-radius: 4px;
     }
