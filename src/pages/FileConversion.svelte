@@ -41,7 +41,7 @@
 
                     // When file has no audio format it will throw error here
                     const outputData = await ffmpeg.readFile(`output.${selectedFormat}`);
-                    const blob = new Blob([outputData], {type: `${selectedCategory}/${selectedFormat}`});
+                    const blob = new Blob([outputData], {type: `${categories}/${selectedFormat}`});
 
                     const src = URL.createObjectURL(blob);
                     const dotsplit = file.name.split(".");
@@ -57,14 +57,6 @@
                     // a.href = src;
                     // a.download = dotsplit.join(".") + "." + selectedFormat;
                     // a.click();
-                    const a = document.createElement("a");
-                    a.href = URL.createObjectURL(blob);
-                    a.download = "output.wav";
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(a.href);
-                    // URL.revokeObjectURL(a.href);
                 } catch (error) {
                     console.error(error);
                     alert('An error occurred during conversion. Please try again.');
