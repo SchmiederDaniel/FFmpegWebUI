@@ -7,6 +7,7 @@
 
     let selectedCategory = $state("audio");
     let selectedFormat = $state("mp3");
+    let formatSelector;
 
     const categories = {
         audio: ["mp3", "aac", "flac", "ogg", "wav"],
@@ -14,7 +15,7 @@
         // image: ["jpg", "png", "gif", "bmp", "tiff"],
     };
 
-    function copyArray(array)  {
+    function copyArray(array) {
         const newBuffer = new ArrayBuffer(array.byteLength);
         const newArray = new Uint8Array(newBuffer);
         newArray.set(new Uint8Array(array));
@@ -83,7 +84,7 @@
         <h2>Convert to</h2>
         <div>
             Category:
-            <select bind:value={selectedCategory}>
+            <select bind:value={selectedCategory} onchange={() => selectedFormat = categories[selectedCategory][0]}>
                 {#each Object.keys(categories) as category}
                     <option value={category}>{category}</option>
                 {/each}
@@ -91,7 +92,7 @@
         </div>
         <div>
             File format:
-            <select bind:value={selectedFormat}>
+            <select bind:value={selectedFormat} bind:this={formatSelector}>
                 {#each categories[selectedCategory] as format}
                     <option value={format}>{format}</option>
                 {/each}
@@ -104,11 +105,12 @@
             <h2>Results</h2>
             {#each outputFiles as file}
                 <div class="row">
-                    <button onclick={() => download(file)}>
-                        <DownloadIcon padding={0}></DownloadIcon>
-                    </button>
-                    <div class="filename">{file.name}</div>
-                    {file.category}
+                    <div style="display: flex;">
+                        <button onclick={() => download(file)}>
+                            <DownloadIcon padding={0}></DownloadIcon>
+                        </button>
+                        <div class="filename">{file.name}</div>
+                    </div>
                     {#if file.category === "video"}
                         <video controls src={file.src}>
                             <track kind="captions" default src={file.src}/>
@@ -139,6 +141,18 @@
         background-color: color-mix(in lab, var(--dark-color) 95%, white 5%);
     }
 
+    @media (max-width: 800px) {
+        .row {
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .row audio, .row video {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+        }
+    }
+
     .row, audio {
         border-radius: 8px;
     }
@@ -148,5 +162,7 @@
         max-width: 100%;
         overflow-x: auto;
         white-space: nowrap;
+        flex-grow: 1;
+        text-align: center;
     }
 </style>

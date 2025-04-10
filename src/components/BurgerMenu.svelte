@@ -43,13 +43,12 @@
     }
 
     main {
-        position: absolute;
-        background-color: var(--light-color);
-        height: 100%;
+        position: sticky;
+        background-color: var(--burger-menu-color);
         max-width: 0;
         transition: all 0.3s 0.05s;
-        box-shadow: -3px 0 0 rgba(255, 255, 255, 0.8) inset;
-        box-sizing: border-box;
+        /*box-shadow: -3px 0 0 rgba(255, 255, 255, 0.8) inset;*/
+        /*box-sizing: border-box;*/
         z-index: 1;
     }
 
@@ -69,7 +68,7 @@
     }
 
     button {
-        padding: 4px 8px;
+        padding: var(--padding) calc(var(--padding) * 2);
         margin: 6px 8px;
 
         font-size: 1.3em;
@@ -77,6 +76,7 @@
         background-color 0.25s;
         display: flex;
         align-items: center;
+        /*white-space: nowrap;*/
 
         min-height: 42px;
     }
@@ -89,7 +89,7 @@
     }
 
     .selected {
-        border-left: 4px solid currentColor;
+        border-left: 4px solid black;
         border-bottom-left-radius: 4px;
         border-top-left-radius: 4px;
     }

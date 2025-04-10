@@ -1,6 +1,6 @@
 
 <script>
-    const {padding = 5} = $props();
+    const {padding = 4} = $props();
 </script>
 <main style="padding: {padding}px">
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" class="size-6" style="stroke: currentColor;">

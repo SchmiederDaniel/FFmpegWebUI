@@ -23,7 +23,7 @@
         </div>
         <FileUpload/>
     </header>
-    <div class="max-size">
+    <div class="max-size" style="flex-direction: row; overflow-y: auto;">
         <BurgerMenu
                 bind:open={open}
                 pages={pages}
@@ -38,12 +38,14 @@
     </div>
 </main>
 <style>
-    h2 {
-        margin: 0;
+    main {
+        overflow-y: hidden;
+        max-height: 100vh;
+        max-width: 100vw;
     }
 
-    .test {
-        overflow-y: auto;
+    h2 {
+        margin: 0;
     }
 
     .title {
@@ -57,12 +59,13 @@
 
     .content {
         overflow-y: auto;
+        top: 0;
     }
 
     header {
         display: flex;
         text-align: center;
         background-color: var(--dark-color);
-        padding: 10px 20px;
+        padding: calc(var(--padding) * 2) calc(var(--padding) * 2.5);
     }
 </style>
