@@ -20,6 +20,7 @@
         <div>4. Can't process files twice</div>
         <div>5. Make all the ffmpeg options changable in a popup</div>
         <div>6. Handle more errors correctly: required audio or video stream</div>
+        <div>7. Create a toast message component which can show important messages.</div>
     </div>
 </main>
 

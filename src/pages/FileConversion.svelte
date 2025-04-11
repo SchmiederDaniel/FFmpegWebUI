@@ -2,12 +2,21 @@
     import ffmpegTools from "../assets/js/ffmpegtools.svelte.js"
     import DownloadIcon from "../assets/icons/DownloadIcon.svelte";
 
-    let convertButton;
+    const convertableFormats = [
+        "mp3",
+        "ogg",
+        "wav",
+        "mp4",
+        "avi",
+        "mkv",
+        "mov",
+    ];
     let outputFiles = $state([]);
+    let outputProgress = $state([]);
 
     let selectedCategory = $state("audio");
     let selectedFormat = $state("mp3");
-    let formatSelector;
+    let progressIndex = $state(0);
 
     const categories = {
         audio: ["mp3", "aac", "flac", "ogg", "wav"],
@@ -15,65 +24,60 @@
         // image: ["jpg", "png", "gif", "bmp", "tiff"],
     };
 
-    function copyArray(array) {
-        const newBuffer = new ArrayBuffer(array.byteLength);
-        const newArray = new Uint8Array(newBuffer);
-        newArray.set(new Uint8Array(array));
-        return newArray;
-    }
-
     async function convert() {
-        const ffmpeg = ffmpegTools.ffmpeg;
-        ffmpegTools.getFiles(async (files) => {
-            outputFiles = [];
-            for (let file of files) {
-                try {
-                    const newName = `input.${file.name.split(".")[0]}`;
-                    const array = copyArray(file.array);
-                    console.log(file.array);
-                    await ffmpeg.writeFile(newName, array);
-                    await ffmpeg.exec([
-                        "-i", newName,
-                        "-vn",
-                        "-acodec",
-                        "libmp3lame",
-                        `output.${selectedFormat}`
-                    ]);
+        outputFiles = [];
+        outputProgress = [];
 
-                    // When file has no audio format it will throw error here
-                    const outputData = await ffmpeg.readFile(`output.${selectedFormat}`);
-                    const blob = new Blob([outputData], {type: `${categories}/${selectedFormat}`});
-
-                    const src = URL.createObjectURL(blob);
-                    const dotsplit = file.name.split(".");
-                    dotsplit.pop(); // remove file extension
-                    outputFiles.push({
-                        name: dotsplit.join("."),
-                        src: src,
-                        format: selectedFormat,
-                        category: selectedCategory,
-                    })
-
-                    // const a = document.createElement("a");
-                    // a.href = src;
-                    // a.download = dotsplit.join(".") + "." + selectedFormat;
-                    // a.click();
-                } catch (error) {
-                    console.error(error);
-                    alert('An error occurred during conversion. Please try again.');
-                } finally {
-                    convertButton.disabled = false;
-                }
-            }
-        })
+        const files = ffmpegTools.getFiles(false, convertableFormats);
+        if (files.length === 0) {
+            alert("No convertible file found! Please make sure to select files of types: " + convertableFormats.join(", ") + ".");
+            return;
+        }
+        for (const file of files) {
+            const outputObject = {
+                name: ffmpegTools.getPlainName(file.name),
+                format: selectedFormat,
+                progress: 0,
+                category: selectedCategory,
+            };
+            outputFiles.push(outputObject);
+        }
+        for (const file of files) {
+            const index = files.indexOf(file);
+            await ffmpegTools.executeFFmpeg(
+                file,
+                selectedFormat,
+                [
+                    "-i", "%input%",
+                    "-vn",
+                    "-acodec",
+                    "libmp3lame",
+                    "%output%",
+                ],
+                (progress_) => {
+                    progressIndex = index;
+                    outputProgress[index] = progress_;
+                },
+                (status) => {
+                    if (status.status === "success") {
+                        const outputData = status.output;
+                        const blob = new Blob([outputData], {type: `${categories}/${selectedFormat}`});
+                        outputFiles[index].src = URL.createObjectURL(blob);
+                        outputFiles[index].name = ffmpegTools.getPlainName(file.name) + "." + selectedFormat;
+                    } else if (status.status === "error") {
+                        console.error(status);
+                        alert('An error occurred during conversion. Please try again.');
+                    }
+                },
+            )
+        }
     }
 
     function download(file) {
         const a = document.createElement("a");
         a.href = file.src;
-        a.download = file.name + "." + selectedFormat;
+        a.download = file.name;
         a.click();
-        console.log(a)
     }
 </script>
 <main class="subpage">
@@ -92,25 +96,33 @@
         </div>
         <div>
             File format:
-            <select bind:value={selectedFormat} bind:this={formatSelector}>
+            <select bind:value={selectedFormat}>
                 {#each categories[selectedCategory] as format}
                     <option value={format}>{format}</option>
                 {/each}
             </select>
         </div>
-        <button onclick={convert} bind:this={convertButton}>Convert</button>
+        <button onclick={convert}>Convert</button>
     </div>
-    {#if outputFiles.length > 0}
-        <div class="card">
-            <h2>Results</h2>
-            {#each outputFiles as file}
-                <div class="row">
-                    <div style="display: flex;">
+    <div class="card">
+        <h2>Results</h2>
+        <div>Converted files will be shown here.</div>
+        {#each outputFiles as file, index}
+            {@const progress = outputProgress[progressIndex]}
+            <div class="row">
+                <div style="display: flex;">
+                    {#if progress !== 100 && index === progressIndex}
+                        <div style="align-content: center; padding: var(--padding)">{progress ? progress : 0}%</div>
+                    {:else if progressIndex < index}
+                        <div style="align-content: center; padding: var(--padding)">0%</div>
+                    {:else}
                         <button onclick={() => download(file)}>
                             <DownloadIcon padding={0}></DownloadIcon>
                         </button>
-                        <div class="filename">{file.name}</div>
-                    </div>
+                    {/if}
+                    <div class="filename">{file.name}</div>
+                </div>
+                {#if progressIndex > index || (progress === 100 && progressIndex === index)}
                     {#if file.category === "video"}
                         <video controls src={file.src}>
                             <track kind="captions" default src={file.src}/>
@@ -118,13 +130,11 @@
                         </video>
                     {:else if file.category === "audio"}
                         <audio controls src={file.src}></audio>
-                    {:else }
-                        {file.format}
                     {/if}
-                </div>
-            {/each}
-        </div>
-    {/if}
+                {/if}
+            </div>
+        {/each}
+    </div>
 </main>
 
 <style>
@@ -158,6 +168,7 @@
     }
 
     .filename {
+        padding: 0 calc(var(--padding) * 2);
         align-content: center;
         max-width: 100%;
         overflow-x: auto;

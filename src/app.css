@@ -95,7 +95,7 @@ button:focus-visible {
     background-color: var(--dark-color);
     padding: calc(var(--padding) * 4) calc(var(--padding) * 4);
     border-radius: 8px;
-    margin: var(--padding) 0;
+    margin: calc(var(--padding) * 2) 0;
     max-width: min(80%, 500px);
 }
 
