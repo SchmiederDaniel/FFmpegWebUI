@@ -170,6 +170,7 @@
         background-color: color-mix(in lab, white 10%, var(--button-color) 90%);
         border-radius: 8px;
         padding: calc(var(--padding) * 2);
+        color: var(--text2);
         display: flex;
         height: 34px;
         align-items: center;
@@ -178,7 +179,7 @@
     .slider::-moz-range-thumb, .slider::-webkit-slider-thumb {
         -webkit-appearance: none;
         appearance: none;
-        background: var(--text);
+        background: var(--text2);
         cursor: pointer;
         width: 18px;
         height: 28px;
