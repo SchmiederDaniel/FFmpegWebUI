@@ -2,55 +2,45 @@
     import ffmpegTools from "../assets/js/ffmpegtools.svelte.js"
     import DownloadIcon from "../assets/icons/DownloadIcon.svelte";
 
-    const convertableFormats = [
-        "mp3",
-        "ogg",
-        "wav",
-        "mp4",
-        "avi",
-        "mkv",
-        "mov",
-    ];
+    const inputAudioTypes = ["mp3", "aac", "flac", "ogg", "wav"];
+    const inputVideoTypes = ["mp4", "avi", "mkv", "mov"];
+    const convertableTypes = inputAudioTypes.concat(inputVideoTypes);
+    let sliderValue = $state("0");
     let outputFiles = $state([]);
     let outputProgress = $state([]);
-
-    let selectedCategory = $state("audio");
-    let selectedFormat = $state("mp3");
     let progressIndex = $state(0);
-
-    const categories = {
-        audio: ["mp3", "aac", "flac", "ogg", "wav"],
-        video: ["mp4", "avi", "mkv", "mov"],
-        other: ["gif"],
-    };
 
     async function convert() {
         outputFiles = [];
         outputProgress = [];
 
-        const files = ffmpegTools.getFiles(false, convertableFormats);
+        const files = ffmpegTools.getFiles(false, convertableTypes);
         if (files.length === 0) {
-            alert("No convertible file found! Please make sure to select files of types: " + convertableFormats.join(", ") + ".");
+            alert("No convertible file found! Please make sure to select files of types: " + convertableTypes.join(", ") + ".");
             return;
         }
         for (const file of files) {
             const outputObject = {
                 name: ffmpegTools.getPlainName(file.name),
-                format: selectedFormat,
+                type: file.name.replace(ffmpegTools.getPlainName(file.name) + ".", ""),
                 progress: 0,
-                category: selectedCategory,
             };
             outputFiles.push(outputObject);
         }
         for (const file of files) {
             const index = files.indexOf(file);
+            const outputObject = outputFiles[index];
+            const ffmpegArguments = [
+                "-i", "%input%",
+                "-af", `volume=${sliderValue}dB`,
+                "-vcodec", "copy",
+                "%output%",
+            ];
+            console.log(ffmpegArguments)
             await ffmpegTools.executeFFmpeg(
                 file,
-                selectedFormat,
-                [
-                    "-i", "%input%",
-                    "%output%",
-                ],
+                outputObject.type,
+                ffmpegArguments,
                 (progress_) => {
                     progressIndex = index;
                     outputProgress[index] = progress_;
@@ -58,9 +48,9 @@
                 (status) => {
                     if (status.status === "success") {
                         const outputData = status.output;
-                        const blob = new Blob([outputData], {type: `${categories}/${selectedFormat}`});
+                        const blob = new Blob([outputData]/* , {type: `${categories}/${selectedFormat}`} */);
                         outputFiles[index].src = URL.createObjectURL(blob);
-                        outputFiles[index].name = ffmpegTools.getPlainName(file.name) + "." + selectedFormat;
+                        outputFiles[index].name = file.name;
                     } else if (status.status === "error") {
                         console.error(status);
                         alert('An error occurred during conversion. Please try again.');
@@ -79,31 +69,19 @@
 </script>
 <main class="subpage">
     <div class="page-title">
-        File conversion
+        Change Audio Volume
     </div>
     <div class="card">
-        <h2>Convert to</h2>
-        <div>
-            Category:
-            <select bind:value={selectedCategory} onchange={() => selectedFormat = categories[selectedCategory][0]}>
-                {#each Object.keys(categories) as category}
-                    <option value={category}>{category}</option>
-                {/each}
-            </select>
+        <h2>Increase or Decrease by:</h2>
+        <div class="slider-container">
+            <div>{sliderValue} dB</div>
+            <input bind:value={sliderValue} type="range" min="-10" max="10" class="slider">
         </div>
-        <div>
-            File format:
-            <select bind:value={selectedFormat}>
-                {#each categories[selectedCategory] as format}
-                    <option value={format}>{format}</option>
-                {/each}
-            </select>
-        </div>
-        <button onclick={convert}>Convert</button>
+        <button onclick={convert}>Process</button>
     </div>
     <div class="card">
         <h2>Results</h2>
-        <div>Converted files will be shown here.</div>
+        <div>Processed files will be shown here.</div>
         {#each outputFiles as file, index}
             {@const progress = outputProgress[progressIndex]}
             <div class="row">
@@ -121,15 +99,13 @@
                 </div>
                 {#if progressIndex > index || (progress === 100 && progressIndex === index)}
                     {#if file.src}
-                        {#if file.category === "video"}
+                        {#if inputVideoTypes.includes(file.type)}
                             <video controls src={file.src}>
                                 <track kind="captions" default src={file.src}/>
-                                <source src={file.src} type="video/${file.format}"/>
+                                <source src={file.src} type="video/${file.type}"/>
                             </video>
-                        {:else if file.category === "audio"}
+                        {:else if inputAudioTypes.includes(file.type)}
                             <audio controls src={file.src}></audio>
-                        {:else if file.category === "other"}
-                            <img class="outputIMG" src="{file.src}" alt="Converted output">
                         {/if}
                     {/if}
                 {/if}
@@ -168,8 +144,8 @@
         border-radius: 8px;
     }
 
-    .outputIMG {
-        max-width: 380px;
+    video {
+        max-width: 280px;
     }
 
     .filename {
@@ -180,5 +156,33 @@
         white-space: nowrap;
         flex-grow: 1;
         text-align: center;
+    }
+
+    /* Slider design from https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_rangeslider */
+    .slider {
+        width: 100%;
+        height: 8px;
+        background-color: color-mix(in lab, black 50%, var(--text) 50%);
+        border-radius: 4px;
+    }
+
+    .slider-container {
+        background-color: color-mix(in lab, white 10%, var(--button-color) 90%);
+        border-radius: 8px;
+        padding: calc(var(--padding) * 2);
+        display: flex;
+        height: 34px;
+        align-items: center;
+    }
+
+    .slider::-moz-range-thumb, .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        background: var(--text);
+        cursor: pointer;
+        width: 18px;
+        height: 28px;
+        border: none;
+        border-radius: 5px;
     }
 </style>

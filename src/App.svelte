@@ -7,10 +7,13 @@
     import StartpagePage from "./pages/StartpagePage.svelte";
     import FileConversion from "./pages/FileConversion.svelte";
     import ConvertIcon from "./assets/icons/ConvertIcon.svelte";
+    import SpeakerIcon from "./assets/icons/SpeakerIcon.svelte";
+    import ChangeVolume from "./pages/ChangeVolume.svelte";
 
     const pages = [
         {icon: StartIcon, text: "Home", page: StartpagePage},
         {icon: ConvertIcon, text: "File conversion", page: FileConversion},
+        {icon: SpeakerIcon, text: "Change Volume", page: ChangeVolume},
     ];
     let openPage = $state(0);
     let open = $state(false);
