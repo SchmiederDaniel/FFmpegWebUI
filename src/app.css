@@ -72,6 +72,17 @@ button:active {
     background-color: color-mix(in lab, white 15%, var(--button-color) 85%);
 }
 
+button:disabled {
+    border: 1px solid red;
+    color: color-mix(in lab, var(--text2) 50%, black 50%);
+    cursor: not-allowed;
+    text-decoration: line-through;
+}
+
+button:disabled:hover {
+    border-color: red;
+}
+
 select:hover, button:hover {
     background-color: color-mix(in lab, white 10%, var(--button-color) 90%);
     border-color: #646cff;
@@ -96,7 +107,8 @@ button:focus-visible {
     padding: calc(var(--padding) * 4) calc(var(--padding) * 4);
     border-radius: 8px;
     margin: calc(var(--padding) * 2) 0;
-    max-width: min(80%, 500px);
+    /*max-width: min(80%, 800px);*/
+    max-width: 850px;
 }
 
 .hamburger span .hamburger-inner,

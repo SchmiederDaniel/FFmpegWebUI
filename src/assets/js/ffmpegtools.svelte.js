@@ -106,7 +106,7 @@ function getFiles(single, types) {
  * @param fileName {string} The file name
  * @returns {string} The file name without the extension
  */
-const getPlainName = (fileName) => fileName.replace(/\.[^/.]+$/, "");
+const getPlainName = (fileName) => fileName.replace(/\.[^.]+$/, "");
 
 export default {
     executeFFmpeg: executeFFmpeg,
