@@ -18,7 +18,7 @@
             }
             const outputFileFormat = outputTypeByExtension(textAreaText);
             const outputFileName = extractOutputFilename(textAreaText);
-            let log = output.createLog(files[0], outputFileFormat);
+            const log = output.createLog(files[0], outputFileFormat);
             log.setFileName(outputFileName);
             const ffmpegArguments = splitCommand(textAreaText);
             /** @type {Array<log>} */
