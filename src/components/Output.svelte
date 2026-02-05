@@ -1,7 +1,7 @@
 <script>
     import DownloadIcon from "../assets/icons/DownloadIcon.svelte";
 
-    let { active = $bindable()} = $props();
+    let {active = $bindable()} = $props();
 
     const AUDIO_TYPES = ["mp3", "aac", "flac", "ogg", "wav"];
     const VIDEO_TYPES = ["mp4", "avi", "mkv", "mov"];
@@ -11,7 +11,7 @@
     let logs = $state([]);
 
     function category(type) {
-        if(AUDIO_TYPES.includes(type)) {
+        if (AUDIO_TYPES.includes(type)) {
             return "audio";
         } else if (VIDEO_TYPES.includes(type)) {
             return "video";
@@ -28,12 +28,21 @@
 
         constructor(inputData, outputType) {
             this.inputData = inputData;
-            this.name = this.inputData.name;
-            this.plainName = this.name.replace(/\.[^.]+$/, "");
-            this.type = this.name.replace(this.plainName + ".", "");
-            if(outputType)
+            this.setFileName(this.inputData.name)
+            if (outputType)
                 this.type = outputType;
             this.category = category(this.type);
+        }
+
+        /**
+         * Updates the shown file name based on a full file name with extension.
+         * Example: "MyMp3.mp3"
+         * @param name {String}
+         */
+        setFileName(name) {
+            this.name = name;
+            this.plainName = this.name.replace(/\.[^.]+$/, "");
+            this.type = this.name.replace(this.plainName + ".", "");
         }
 
         getProgress() {
@@ -148,7 +157,7 @@
                             <DownloadIcon padding={0}></DownloadIcon>
                         </button>
                     {/if}
-                    <div class="filename">{log.plainName}</div>
+                    <div class="filename">{log.name}</div>
                 </div>
                 {#if log.src}
                     {#if log.category === "video"}
@@ -157,9 +166,11 @@
                             <source src={log.src} type="video/${log.type}"/>
                         </video>
                     {:else if log.category === "audio"}
-                        <audio controls src={log.src}></audio>
+                        <div class="audio-container">
+                            <audio controls src={log.src}></audio>
+                        </div>
                     {:else if log.category === "image"}
-                        <img src={log.src} alt={log.plainName}/>
+                        <img src={log.src} alt={log.name}/>
                     {/if}
                 {/if}
             </div>

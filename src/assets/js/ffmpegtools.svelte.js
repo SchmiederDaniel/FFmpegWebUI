@@ -78,22 +78,64 @@ async function executeFFmpeg(file, outputType, ffmpegArguments, progressCallback
     }
 }
 
+async function executeFFmpegMultipleInput(files, outputType, outputFileName, ffmpegArguments, progressCallback, statusCallback) {
+    const ffmpeg = new FFmpeg();
+    await ffmpeg.load();
+    try {
+        ffmpeg.on("progress", async (e) => {
+            progressCallback(Math.round(e.progress * 100));
+        });
+
+        for (let i = 0; i < files.length; i++) {
+            const file = await files[i];
+            const array = copyArray(file.array);
+            await ffmpeg.writeFile(`%input${i + 1}%`, array);
+        }
+
+        await ffmpeg.exec(ffmpegArguments);
+        const outputData = await ffmpeg.readFile(outputFileName);
+
+        statusCallback({
+            status: "success",
+            output: outputData,
+            outputType: outputType,
+        });
+    } catch (error) {
+        console.error("Error executing FFmpeg command:", error);
+        statusCallback("error");
+    } finally {
+    }
+}
+
 /**
  * Get files from the file array and filter them by type.
  * @param {boolean} single If true, return only the first file
- * @param {string[]} types File types to filter by
+ * @param {string[]} types File types to filter by. (Can be empty to use all file types)
  * @return {Array[File]} Array of the filtered files
  */
-function getFiles(single, types) {
+function getFiles(single, types = []) {
     types = types.map(type => type.toLowerCase());
     const result = [];
     for (const file of files) {
         const name = file.name.toLowerCase();
         const ext = name.split('.').pop();
         file.type = ext;
-        if (types.includes(ext)) {
+        if (types.includes(ext) || types.length === 0) {
             result.push(file);
         }
+    }
+    if (single) {
+        return result[0];
+    }
+    return result;
+}
+
+function getFileTypes(single) {
+    const result = [];
+    for (const file of files) {
+        const name = file.name.toLowerCase();
+        const ext = name.split('.').pop();
+        result.push(ext);
     }
     if (single) {
         return result[0];
@@ -110,8 +152,10 @@ const getPlainName = (fileName) => fileName.replace(/\.[^.]+$/, "");
 
 export default {
     executeFFmpeg: executeFFmpeg,
+    executeFFmpegMultipleInput: executeFFmpegMultipleInput,
     openFileDialog: openFileDialog,
     getPlainName: getPlainName,
     getFiles: getFiles,
+    getFileTypes: getFileTypes,
     fileCount: () => files.length,
 }

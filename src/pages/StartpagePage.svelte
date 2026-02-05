@@ -26,12 +26,6 @@
             3. After processing files the output will be shown at the bottom of the page.
         </div>
     </div>
-    <div class="card todo">
-        <h2>TODO for me</h2>
-        <div>1. Can't process files twice. A feature where the processed files will be re-applied to the input files would be useful for chaining multiple tools.</div>
-        <div>2. Make error handling easier like a abstract method which checks file properties (e.g. available audio or video stream)</div>
-        <div>3. Create a toast message component which can show important messages.</div>
-    </div>
 </main>
 
 <style>

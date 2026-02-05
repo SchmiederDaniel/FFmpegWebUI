@@ -68,8 +68,8 @@
     }
 
     button {
-        padding: var(--padding) calc(var(--padding) * 2);
-        margin: 6px 8px;
+        padding: calc(var(--padding) * 2) calc(var(--padding) * 2);
+        margin: 3px 6px;
 
         font-size: 1.3em;
         transition: all 0.1s,

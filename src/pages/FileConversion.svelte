@@ -4,15 +4,11 @@
 
     let output;
     let active = $state(false);
-    const convertableFormats = [
-        "mp3",
-        "ogg",
-        "wav",
-        "mp4",
-        "avi",
-        "mkv",
-        "mov",
-    ];
+    const imageFormats = ["png", "jpg", "jpeg", "webp"]
+    const audioFormats = ["mp3", "ogg", "wav"]
+    const videoFormats = ["mp4", "avi", "mkv", "mov"]
+
+    const convertableFormats = imageFormats.concat(audioFormats).concat(videoFormats);
     let selectedCategory = $state("audio");
     let selectedFormat = $state("mp3");
 

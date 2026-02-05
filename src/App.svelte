@@ -1,6 +1,6 @@
 <script>
     import FileUpload from "./components/FileUpload.svelte";
-    import BurgerMenu from "./components/BurgerMenu.svelte";
+    import SideMenu from "./components/SideMenu.svelte";
     import BurgerButton from "./components/BurgerButton.svelte";
 
     import StartIcon from "./assets/icons/StartIcon.svelte";
@@ -9,11 +9,14 @@
     import ConvertIcon from "./assets/icons/ConvertIcon.svelte";
     import SpeakerIcon from "./assets/icons/SpeakerIcon.svelte";
     import ChangeVolume from "./pages/ChangeVolume.svelte";
+    import EditIcon from "./assets/icons/EditIcon.svelte";
+    import Custom from "./pages/Custom.svelte";
 
     const pages = [
         {icon: StartIcon, text: "Home", page: StartpagePage},
         {icon: ConvertIcon, text: "File conversion", page: FileConversion},
         {icon: SpeakerIcon, text: "Change Volume", page: ChangeVolume},
+        {icon: EditIcon, text: "Custom", page: Custom},
     ];
     let openPage = $state(0);
     let open = $state(false);
@@ -27,7 +30,7 @@
         <FileUpload/>
     </header>
     <div class="max-size" style="flex-direction: row; overflow-y: auto;">
-        <BurgerMenu
+        <SideMenu
                 bind:open={open}
                 pages={pages}
                 bind:openPage={openPage}/>
